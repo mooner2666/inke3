@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-deep-black text-white;
+    font-family: 'Rajdhani', 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-glow-silver {
+    text-shadow: 0 0 10px #C0C0C0, 0 0 20px #E8E8E8, 0 0 30px #F5F5F5;
+  }
+
+  .text-glow-bright {
+    text-shadow: 0 0 10px #F5F5F5, 0 0 20px #E8E8E8, 0 0 30px #D4D4D4;
+  }
+
+  .text-glow-medium {
+    text-shadow: 0 0 10px #D4D4D4, 0 0 20px #C0C0C0, 0 0 30px #A8A8A8;
+  }
+
+  .box-glow-silver {
+    box-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
+  }
+
+  .box-glow-bright {
+    box-shadow: 0 0 20px rgba(245, 245, 245, 0.5);
+  }
+
+  .box-glow-mercury {
+    box-shadow: 0 0 20px rgba(212, 212, 212, 0.5);
+  }
+}
+
+img {
+  object-position: top;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0A0A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #C0C0C0, #A8A8A8);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #F5F5F5, #C0C0C0);
+}
