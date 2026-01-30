@@ -45,7 +45,7 @@ export default function NotificationBell() {
   const fetchNotifications = async () => {
     if (!user) return
     setLoading(true)
-    const { data } = await supabase
+    const { data } = (await supabase
       .from('notifications')
       .select(`
         *,
@@ -55,7 +55,7 @@ export default function NotificationBell() {
       `)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(20)
+      .limit(20)) as any
 
     setNotifications((data as Notification[]) || [])
     setLoading(false)
