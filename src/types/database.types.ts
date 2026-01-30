@@ -55,6 +55,7 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
+          parent_id: string | null
           post_id: string | null
           user_id: string | null
         }
@@ -62,6 +63,7 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          parent_id?: string | null
           post_id?: string | null
           user_id?: string | null
         }
@@ -69,6 +71,7 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          parent_id?: string | null
           post_id?: string | null
           user_id?: string | null
         }
@@ -85,6 +88,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
             referencedColumns: ["id"]
           },
         ]
@@ -123,6 +133,150 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorites: {
+        Row: {
+          id: string
+          user_id: string
+          work_id: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          work_id: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          work_id?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_work_id_fkey"
+            columns: ["work_id"]
+            isOneToOne: false
+            referencedRelation: "works"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      likes: {
+        Row: {
+          id: string
+          user_id: string
+          work_id: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          work_id: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          work_id?: string
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "likes_work_id_fkey"
+            columns: ["work_id"]
+            isOneToOne: false
+            referencedRelation: "works"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          actor_id: string | null
+          type: string
+          work_id: string | null
+          post_id: string | null
+          comment_id: string | null
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          actor_id?: string | null
+          type: string
+          work_id?: string | null
+          post_id?: string | null
+          comment_id?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          actor_id?: string | null
+          type?: string
+          work_id?: string | null
+          post_id?: string | null
+          comment_id?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_work_id_fkey"
+            columns: ["work_id"]
+            isOneToOne: false
+            referencedRelation: "works"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "forum_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
             referencedColumns: ["id"]
           },
         ]
@@ -208,7 +362,9 @@ export type Database = {
           cover_url: string | null
           created_at: string | null
           description: string | null
+          favorites_count: number | null
           id: string
+          likes_count: number | null
           title: string
           updated_at: string | null
           user_id: string | null
@@ -219,7 +375,9 @@ export type Database = {
           cover_url?: string | null
           created_at?: string | null
           description?: string | null
+          favorites_count?: number | null
           id?: string
+          likes_count?: number | null
           title: string
           updated_at?: string | null
           user_id?: string | null
@@ -230,7 +388,9 @@ export type Database = {
           cover_url?: string | null
           created_at?: string | null
           description?: string | null
+          favorites_count?: number | null
           id?: string
+          likes_count?: number | null
           title?: string
           updated_at?: string | null
           user_id?: string | null

@@ -8,12 +8,12 @@ import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 type Work = Database['public']['Tables']['works']['Row'] & {
-  profiles: { username: string } | null
+  profiles: { username: string; display_name: string | null } | null
   work_tags: Array<{ tags: { name: string } | null }>
 }
 
 type Post = Database['public']['Tables']['forum_posts']['Row'] & {
-  profiles: { username: string } | null
+  profiles: { username: string; display_name: string | null } | null
   comments: Array<{ id: string }>
 }
 
@@ -31,14 +31,14 @@ export default function Home() {
       // Fetch latest works
       const { data: worksData } = await supabase
         .from('works')
-        .select('*, profiles(username), work_tags(tags(name))')
+        .select('*, profiles(username, display_name), work_tags(tags(name))')
         .order('created_at', { ascending: false })
         .limit(6)
 
       // Fetch latest posts
       const { data: postsData } = await supabase
         .from('forum_posts')
-        .select('*, profiles(username), comments(id)')
+        .select('*, profiles(username, display_name), comments(id)')
         .order('created_at', { ascending: false })
         .limit(6)
 
@@ -83,6 +83,7 @@ export default function Home() {
                 description={work.description}
                 coverUrl={work.cover_url}
                 author={work.profiles?.username || 'Unknown'}
+                authorDisplayName={work.profiles?.display_name}
                 viewCount={work.view_count}
                 tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)}
               />
@@ -117,7 +118,7 @@ export default function Home() {
                 id={post.id}
                 title={post.title}
                 content={post.content}
-                author={post.profiles?.username || 'Unknown'}
+                author={post.profiles?.display_name || post.profiles?.username || 'Unknown'}
                 createdAt={post.created_at || ''}
                 commentCount={post.comments.length}
                 category={post.category}

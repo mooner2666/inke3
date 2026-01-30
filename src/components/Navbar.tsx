@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Search, User, LogOut, BookOpen, MessageSquare } from 'lucide-react'
 import { useAuth } from '@/lib/AuthContext'
 import Button from './Button'
-import InkeCityLogo from './InkeCityLogo'
+import NotificationBell from '@/components/NotificationBell'
 
 export default function Navbar() {
   const { user, signOut } = useAuth()
@@ -19,10 +19,12 @@ export default function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="group">
-            <div className="w-20 md:w-24 group-hover:scale-105 transition-transform duration-300">
-              <InkeCityLogo animated={true} showText={true} />
-            </div>
-          </Link>
+            <img 
+              src="/万维银客城横版 logo.png" 
+              alt="万维银客城" 
+              className="h-10 w-auto hover:scale-105 transition-transform duration-300 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+            />
+          </Link>        
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
@@ -44,6 +46,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
+                <NotificationBell />
                 <Link to={`/profile/${user.id}`}>
                   <Button variant="ghost" size="sm" className="flex items-center space-x-2">
                     <User size={18} />

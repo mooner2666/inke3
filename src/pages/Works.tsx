@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/AuthContext'
 import Button from '@/components/Button'
 
 type Work = Database['public']['Tables']['works']['Row'] & {
-  profiles: { username: string } | null
+  profiles: { username: string; display_name: string | null } | null
   work_tags: Array<{ tags: { name: string } | null }>
 }
 
@@ -36,7 +36,7 @@ export default function Works() {
     setLoading(true)
     let query = supabase
       .from('works')
-      .select('*, profiles(username), work_tags(tags(name))')
+      .select('*, profiles(username, display_name), work_tags(tags(name))')
       .order('created_at', { ascending: false })
 
     if (selectedTags.length > 0) {
@@ -132,6 +132,7 @@ export default function Works() {
                 description={work.description}
                 coverUrl={work.cover_url}
                 author={work.profiles?.username || 'Unknown'}
+                authorDisplayName={work.profiles?.display_name}
                 viewCount={work.view_count}
                 tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)}
               />

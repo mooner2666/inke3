@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 
 export default function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -86,38 +87,28 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-        <h1
-          className="text-6xl md:text-8xl font-title font-bold mb-6"
-          style={{
-            background: 'linear-gradient(135deg, #FFFFFF 0%, #F5F5F5 25%, #E8E8E8 50%, #D4D4D4 75%, #C0C0C0 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            textShadow: '3px 3px 6px rgba(0,0,0,0.6), -2px -2px 4px rgba(255,255,255,0.4), 1px 1px 2px rgba(0,0,0,0.8)',
-            filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.5))',
-            letterSpacing: '0.05em',
-            fontWeight: 900,
-          }}
-        >
-          万维银客城
-        </h1>
-        <p className="text-xl md:text-2xl text-silver-light font-sans mb-8 max-w-2xl tracking-[0.2em]">
-          INKE CITY
-        </p>
+        {/* 新 Logo 图片 */}
+        <img 
+          src="/万维银客城横版 logo.png" 
+          alt="万维银客城 INKE CITY" 
+          className="w-auto h-36 mb-8 drop-shadow-[0_0_30px_rgba(255,255,255,0.4)]"
+        />
+        
         <p className="text-lg text-gray-300 font-mono mb-12 max-w-3xl">
-          在赛博空间中分享你的作品，探索无限创意的未来城市
+          自留地，收藏畅聊你喜欢的作品
         </p>
+        
         <div className="flex flex-col sm:flex-row gap-4">
-          <a href="/works">
+          <Link to="/works">
             <button className="px-8 py-4 bg-transparent border-2 border-silver-main text-silver-main hover:bg-silver-main hover:text-deep-black transition-all duration-300 rounded-lg font-cyber text-lg hover:shadow-[0_0_30px_rgba(192,192,192,0.8)]">
               探索作品库
             </button>
-          </a>
-          <a href="/forum">
+          </Link>
+          <Link to="/forum">
             <button className="px-8 py-4 bg-transparent border-2 border-silver-light text-silver-light hover:bg-silver-light hover:text-deep-black transition-all duration-300 rounded-lg font-cyber text-lg hover:shadow-[0_0_30px_rgba(232,232,232,0.8)]">
               加入讨论
             </button>
-          </a>
+          </Link>
         </div>
       </div>
 

@@ -8,12 +8,12 @@ import { Search as SearchIcon, User, FileText, Tag } from 'lucide-react'
 import Button from '@/components/Button'
 
 type Work = Database['public']['Tables']['works']['Row'] & {
-  profiles: { username: string } | null
+  profiles: { username: string; display_name: string | null } | null
   work_tags: Array<{ tags: { name: string } | null }>
 }
 
 type Post = Database['public']['Tables']['forum_posts']['Row'] & {
-  profiles: { username: string } | null
+  profiles: { username: string; display_name: string | null } | null
   comments: Array<{ id: string }>
 }
 
@@ -41,7 +41,7 @@ export default function Search() {
       if (searchType === 'all' || searchType === 'works') {
         const { data: worksData } = await supabase
           .from('works')
-          .select('*, profiles(username), work_tags(tags(name))')
+          .select('*, profiles(username, display_name), work_tags(tags(name))')
           .or(`title.ilike.%${query}%,description.ilike.%${query}%,content.ilike.%${query}%`)
           .order('created_at', { ascending: false })
 
@@ -52,7 +52,7 @@ export default function Search() {
       if (searchType === 'all' || searchType === 'posts') {
         const { data: postsData } = await supabase
           .from('forum_posts')
-          .select('*, profiles(username), comments(id)')
+          .select('*, profiles(username, display_name), comments(id)')
           .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
           .order('created_at', { ascending: false })
 
@@ -181,6 +181,7 @@ export default function Search() {
                           description={work.description}
                           coverUrl={work.cover_url}
                           author={work.profiles?.username || 'Unknown'}
+                          authorDisplayName={work.profiles?.display_name}
                           viewCount={work.view_count}
                           tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)}
                         />
@@ -202,7 +203,7 @@ export default function Search() {
                           id={post.id}
                           title={post.title}
                           content={post.content}
-                          author={post.profiles?.username || 'Unknown'}
+                          author={post.profiles?.display_name || post.profiles?.username || 'Unknown'}
                           createdAt={post.created_at || ''}
                           commentCount={post.comments.length}
                           category={post.category}

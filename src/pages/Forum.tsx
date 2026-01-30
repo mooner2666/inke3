@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/AuthContext'
 import Button from '@/components/Button'
 
 type Post = Database['public']['Tables']['forum_posts']['Row'] & {
-  profiles: { username: string } | null
+  profiles: { username: string; display_name: string | null } | null
   comments: Array<{ id: string }>
 }
 
@@ -26,7 +26,7 @@ export default function Forum() {
     setLoading(true)
     let query = supabase
       .from('forum_posts')
-      .select('*, profiles(username), comments(id)')
+      .select('*, profiles(username, display_name), comments(id)')
       .order('created_at', { ascending: false })
 
     if (category !== 'all') {
@@ -103,7 +103,7 @@ export default function Forum() {
                 id={post.id}
                 title={post.title}
                 content={post.content}
-                author={post.profiles?.username || 'Unknown'}
+                author={post.profiles?.display_name || post.profiles?.username || 'Unknown'}
                 createdAt={post.created_at || ''}
                 commentCount={post.comments.length}
                 category={post.category}

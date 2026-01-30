@@ -54,6 +54,28 @@ git pull origin main --rebase
 git config user.email "你的邮箱"
 git config user.name "你的名字"
 
+---
+
+# 1. 创建并切换到一个新分支 (比如叫 dev-comment)
+git checkout -b dev-comment
+
+# 2. 在这个分支上随便改代码，然后正常提交
+git add .
+git commit -m "feat: 尝试添加评论功能"
+
+# 3. 如果写好了，想合并回主线
+git checkout main       # 先回到主线
+git merge dev-comment   # 把刚才写的评论功能合进来
+
+---
+### 🌿 开发分支流 (Feature Branch Workflow)
+1. **开工**：`git checkout -b 分支名` (例如 `git checkout -b feat-join-btn`)
+2. **提交**：`git add .` -> `git commit -m "完成某功能"`
+3. **回主线**：`git checkout main`
+4. **拿最新**：`git pull origin main` (防止别人改了代码)
+5. **合代码**：`git merge 分支名`
+6. **推线上**：`git push origin main`
+
 ```
 
 ---

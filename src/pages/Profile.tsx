@@ -4,13 +4,13 @@ import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/database.types'
 import WorkCard from '@/components/WorkCard'
 import PostCard from '@/components/PostCard'
-import { User, Calendar, BookOpen, MessageSquare, Camera, X, Check } from 'lucide-react'
+import { User, Calendar, BookOpen, MessageSquare, Camera, X, Check, Bookmark } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 type Work = Database['public']['Tables']['works']['Row'] & {
-  profiles: { username: string } | null
+  profiles: { username: string; display_name: string | null } | null
   work_tags: Array<{ tags: { name: string } | null }>
 }
 type Post = Database['public']['Tables']['forum_posts']['Row'] & {
@@ -25,7 +25,8 @@ export default function Profile() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [works, setWorks] = useState<Work[]>([])
   const [posts, setPosts] = useState<Post[]>([])
-  const [activeTab, setActiveTab] = useState<'works' | 'posts'>('works')
+  const [favorites, setFavorites] = useState<Work[]>([])
+  const [activeTab, setActiveTab] = useState<'works' | 'posts' | 'favorites'>('works')
   const [loading, setLoading] = useState(true)
   
   // 编辑相关状态
@@ -66,7 +67,7 @@ export default function Profile() {
   const fetchUserContent = async () => {
     const { data: worksData } = await supabase
       .from('works')
-      .select('*, profiles(username), work_tags(tags(name))')
+      .select('*, profiles(username, display_name), work_tags(tags(name))')
       .eq('user_id', id!)
       .order('created_at', { ascending: false })
     setWorks((worksData as Work[]) || [])
@@ -77,6 +78,15 @@ export default function Profile() {
       .eq('user_id', id!)
       .order('created_at', { ascending: false })
     setPosts((postsData as Post[]) || [])
+
+    const { data: favoritesData } = await supabase
+      .from('favorites')
+      .select('work_id, works(*, profiles(username, display_name), work_tags(tags(name)))')
+      .eq('user_id', id!)
+      .order('created_at', { ascending: false })
+
+    const formattedFavorites = favoritesData?.map(f => f.works).filter(Boolean) || []
+    setFavorites(formattedFavorites as Work[])
   }
 
   // 1:1 图像处理逻辑
@@ -235,6 +245,10 @@ export default function Profile() {
                   <MessageSquare size={16} className="text-silver-light" />
                   <span>{posts.length} 帖子</span>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Bookmark size={16} className="text-mercury-glow" />
+                  <span>{favorites.length} 收藏</span>
+                </div>
               </div>
             </div>
           </div>
@@ -248,6 +262,16 @@ export default function Profile() {
           <button onClick={() => setActiveTab('posts')} className={`px-6 py-3 font-cyber rounded-lg border-2 transition-all duration-300 ${activeTab === 'posts' ? 'bg-silver-medium border-silver-medium text-white shadow-[0_0_20px_#A8A8A8]' : 'bg-transparent border-silver-medium/50 text-silver-medium hover:border-silver-medium'}`}>
             <MessageSquare size={18} className="inline mr-2" /> 帖子 ({posts.length})
           </button>
+          <button 
+            onClick={() => setActiveTab('favorites')} 
+            className={`px-6 py-3 font-cyber rounded-lg border-2 transition-all duration-300 ${
+              activeTab === 'favorites' 
+                ? 'bg-mercury-glow border-mercury-glow text-white shadow-[0_0_20px_rgba(128,223,255,0.8)]' 
+                : 'bg-transparent border-mercury-glow/50 text-mercury-glow hover:border-mercury-glow'
+            }`}
+          >
+            <Bookmark size={18} className="inline mr-2" /> 收藏 ({favorites.length})
+          </button>
         </div>
 
         {activeTab === 'works' ? (
@@ -260,15 +284,15 @@ export default function Profile() {
                   title={work.title} 
                   description={work.description} 
                   coverUrl={work.cover_url} 
-                  author={profile.username} 
-                  authorDisplayName={profile.display_name} // 核心修改：确保这里传了昵称
+                  author={profile.username}
+                  authorDisplayName={profile.display_name}
                   viewCount={work.view_count} 
                   tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)} 
                 />
               ))}
             </div>
           )
-        ) : (
+        ) : activeTab === 'posts' ? (
           posts.length === 0 ? <div className="text-center py-20"><p className="text-2xl text-gray-500 font-mono">暂无帖子</p></div> : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {posts.map((post) => (
@@ -277,10 +301,32 @@ export default function Profile() {
                   id={post.id} 
                   title={post.title} 
                   content={post.content} 
-                  author={profile.username} 
+                  author={profile.display_name || profile.username} 
                   createdAt={post.created_at || ''} 
                   commentCount={post.comments.length} 
                   category={post.category} 
+                />
+              ))}
+            </div>
+          )
+        ) : (
+          favorites.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-2xl text-gray-500 font-mono">暂无收藏</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {favorites.map((work) => (
+                <WorkCard 
+                  key={work.id} 
+                  id={work.id} 
+                  title={work.title} 
+                  description={work.description} 
+                  coverUrl={work.cover_url} 
+                  author={work.profiles?.username || 'Unknown'}
+                  authorDisplayName={work.profiles?.display_name}
+                  viewCount={work.view_count} 
+                  tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)} 
                 />
               ))}
             </div>

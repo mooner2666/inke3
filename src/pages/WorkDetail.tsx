@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/database.types'
-import { User, Calendar, Eye, ArrowLeft, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
+import { User, Calendar, Eye, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Heart, Bookmark } from 'lucide-react'
 import TagPill from '@/components/TagPill'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
@@ -26,6 +26,10 @@ export default function WorkDetail() {
   const [chapters, setChapters] = useState<Chapter[]>([])
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [isLiked, setIsLiked] = useState(false)
+  const [isFavorited, setIsFavorited] = useState(false)
+  const [likesCount, setLikesCount] = useState(0)
+  const [favoritesCount, setFavoritesCount] = useState(0)
 
   const currentChapter = chapters[currentChapterIndex]
 
@@ -34,8 +38,17 @@ export default function WorkDetail() {
       fetchWork()
       fetchChapters()
       incrementViewCount()
+      checkUserInteractions()
     }
-  }, [id])
+  }, [id, user])
+
+  // 当 work 加载后，设置计数
+  useEffect(() => {
+    if (work) {
+      setLikesCount(work.likes_count || 0)
+      setFavoritesCount(work.favorites_count || 0)
+    }
+  }, [work])
 
   useEffect(() => {
     const chapterParam = searchParams.get('chapter')
@@ -82,6 +95,77 @@ export default function WorkDetail() {
         .from('works')
         .update({ view_count: (currentWork.view_count || 0) + 1 })
         .eq('id', id!)
+    }
+  }
+
+  const checkUserInteractions = async () => {
+    if (!user) return
+
+    const { data: likeData } = await supabase
+      .from('likes')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('work_id', id!)
+      .single()
+
+    const { data: favoriteData } = await supabase
+      .from('favorites')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('work_id', id!)
+      .single()
+
+    setIsLiked(!!likeData)
+    setIsFavorited(!!favoriteData)
+  }
+
+  const handleLike = async () => {
+    if (!user) {
+      alert('请先登录')
+      return
+    }
+
+    if (isLiked) {
+      await supabase
+        .from('likes')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('work_id', id!)
+
+      setIsLiked(false)
+      setLikesCount((prev) => Math.max(0, prev - 1))
+    } else {
+      await supabase
+        .from('likes')
+        .insert({ user_id: user.id, work_id: id! })
+
+      setIsLiked(true)
+      setLikesCount((prev) => prev + 1)
+    }
+  }
+
+  const handleFavorite = async () => {
+    if (!user) {
+      alert('请先登录')
+      return
+    }
+
+    if (isFavorited) {
+      await supabase
+        .from('favorites')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('work_id', id!)
+
+      setIsFavorited(false)
+      setFavoritesCount((prev) => Math.max(0, prev - 1))
+    } else {
+      await supabase
+        .from('favorites')
+        .insert({ user_id: user.id, work_id: id! })
+
+      setIsFavorited(true)
+      setFavoritesCount((prev) => prev + 1)
     }
   }
 
@@ -177,6 +261,33 @@ export default function WorkDetail() {
               <BookOpen size={16} className="text-mercury-glow" />
               <span>{chapters.length} 章节</span>
             </div>
+          </div>
+
+          {/* 点赞和收藏按钮 */}
+          <div className="flex justify-center gap-4 mb-6">
+            <button
+              onClick={handleLike}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-cyber transition-all duration-300 ${
+                isLiked
+                  ? 'bg-warning-red/20 border-2 border-warning-red text-warning-red'
+                  : 'bg-surface-dark border-2 border-silver-light/50 text-silver-light hover:border-warning-red hover:text-warning-red'
+              }`}
+            >
+              <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
+              <span>{likesCount} 点赞</span>
+            </button>
+
+            <button
+              onClick={handleFavorite}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-cyber transition-all duration-300 ${
+                isFavorited
+                  ? 'bg-silver-main/20 border-2 border-silver-main text-silver-main'
+                  : 'bg-surface-dark border-2 border-silver-light/50 text-silver-light hover:border-silver-main hover:text-silver-main'
+              }`}
+            >
+              <Bookmark size={20} fill={isFavorited ? 'currentColor' : 'none'} />
+              <span>{favoritesCount} 收藏</span>
+            </button>
           </div>
 
           {/* Tags */}
