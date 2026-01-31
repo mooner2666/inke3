@@ -111,11 +111,11 @@ export default function Works() {
           )}
         </div>
 
-        {/* Works Grid */}
+        {/* Works Grid - 手机 2 列，平板 3 列，桌面 4 列 */}
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(9)].map((_, i) => (
-              <div key={i} className="h-80 bg-surface-dark border-2 border-silver-main/30 rounded-lg animate-pulse" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="aspect-[3/4] bg-surface-dark border-2 border-silver-main/30 rounded-lg animate-pulse" />
             ))}
           </div>
         ) : works.length === 0 ? (
@@ -123,7 +123,7 @@ export default function Works() {
             <p className="text-2xl text-gray-500 font-mono">暂无作品</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {works.map((work) => (
               <WorkCard
                 key={work.id}
@@ -135,6 +135,7 @@ export default function Works() {
                 authorDisplayName={work.profiles?.display_name}
                 viewCount={work.view_count}
                 tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)}
+                category={work.category ?? 'original'}
               />
             ))}
           </div>

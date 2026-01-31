@@ -10,6 +10,7 @@ interface WorkCardProps {
   authorDisplayName?: string | null // 这里就是我们要显示的昵称
   viewCount: number | null
   tags: string[]
+  category?: 'original' | 'fanfiction' | string | null
 }
 
 export default function WorkCard({ 
@@ -20,44 +21,58 @@ export default function WorkCard({
   author, 
   authorDisplayName, 
   viewCount, 
-  tags 
+  tags,
+  category = 'original'
 }: WorkCardProps) {
   // 核心逻辑：如果 authorDisplayName 存在且不等于 ID，就用昵称
   const displayName = authorDisplayName || author;
+  const isFanfiction = category === 'fanfiction';
 
   return (
     <Link to={`/works/${id}`}>
       <div className="group relative bg-surface-dark border-2 border-silver-main/30 rounded-lg overflow-hidden hover:border-silver-main hover:shadow-[0_0_30px_rgba(192,192,192,0.5)] transition-all duration-300">
         
-        {/* Cover Image - 强制 3:4 比例铺满边框 */}
-        <div className="relative bg-grid-gray overflow-hidden aspect-[3/4] w-full"> 
+        {/* Cover Image - 固定 3:4 竖向比例 */}
+        <div className="relative bg-grid-gray overflow-hidden w-full aspect-[3/4]">
           {coverUrl ? (
             <img
               src={coverUrl}
               alt={title}
-              // object-cover 确保图片填充整个 3:4 的区域，不留黑边
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              className="absolute inset-0 w-full h-full object-cover rounded-t-lg group-hover:scale-110 transition-transform duration-500"
               loading="lazy"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-charcoal-dark to-grid-gray">
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-charcoal-dark to-grid-gray rounded-t-lg">
               <span className="text-6xl font-cyber text-silver-main/30">W</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/60 via-transparent to-transparent opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-surface-dark/60 via-transparent to-transparent opacity-40 rounded-t-lg pointer-events-none" />
         </div>
+
+        {/* 封面下方简介 - 单行截断 */}
+        {description && (
+          <p className="text-sm text-gray-400 line-clamp-1 px-3 mt-2 font-mono">
+            {description}
+          </p>
+        )}
 
         {/* Content */}
         <div className="p-4">
-          <h3 className="text-xl font-cyber font-bold text-white mb-2 line-clamp-1 group-hover:text-silver-light transition-colors duration-300">
-            {title}
-          </h3>
-          {description && (
-            <p className="text-sm text-gray-400 mb-3 line-clamp-2 font-mono h-10">
-              {description}
-            </p>
-          )}
+          <div className="flex items-start gap-2 mb-2">
+            <span
+              className={`shrink-0 px-2 py-0.5 text-[10px] font-cyber font-medium border rounded ${
+                isFanfiction
+                  ? 'bg-pink-600/80 border-pink-500 text-white'
+                  : 'bg-silver-main/20 border-silver-main text-silver-light'
+              }`}
+            >
+              {isFanfiction ? '★ 同人' : '✦ 原创'}
+            </span>
+            <h3 className="text-white font-semibold text-sm leading-snug min-w-0">
+              {title}
+            </h3>
+          </div>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-3 h-7 overflow-hidden">

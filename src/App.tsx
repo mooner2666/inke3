@@ -8,6 +8,7 @@ import Register from '@/pages/Register'
 import Works from '@/pages/Works'
 import WorkDetail from '@/pages/WorkDetail'
 import NewWork from '@/pages/NewWork'
+import EditWork from '@/pages/EditWork'
 import Forum from '@/pages/Forum'
 import ForumDetail from '@/pages/ForumDetail'
 import NewPost from '@/pages/NewPost'
@@ -29,6 +30,11 @@ function App() {
 
             <Route path="/works" element={<Works />} />
             <Route path="/works/:id" element={<WorkDetail />} />
+            <Route path="/works/:id/edit" element={
+              <ProtectedRoute>
+                <EditWork />
+              </ProtectedRoute>
+            } />
             <Route path="/works/new" element={
               <ProtectedRoute>
                 <NewWork />

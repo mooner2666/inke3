@@ -358,6 +358,7 @@ export type Database = {
       }
       works: {
         Row: {
+          category: string | null
           content: string
           cover_url: string | null
           created_at: string | null
@@ -371,6 +372,7 @@ export type Database = {
           view_count: number | null
         }
         Insert: {
+          category?: string
           content: string
           cover_url?: string | null
           created_at?: string | null
@@ -384,6 +386,7 @@ export type Database = {
           view_count?: number | null
         }
         Update: {
+          category?: string
           content?: string
           cover_url?: string | null
           created_at?: string | null

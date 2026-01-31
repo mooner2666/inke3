@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/database.types'
-import { User, Calendar, Eye, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Heart, Bookmark } from 'lucide-react'
+import { User, Calendar, Eye, ArrowLeft, BookOpen, ChevronLeft, ChevronRight, Heart, Bookmark, Pencil } from 'lucide-react'
 import TagPill from '@/components/TagPill'
 import { formatDistanceToNow } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 import { useAuth } from '@/lib/AuthContext'
 import Button from '@/components/Button'
+import WorkComments from '@/components/WorkComments'
 
 type Work = Database['public']['Tables']['works']['Row'] & {
   profiles: { username: string; display_name: string | null } | null
@@ -224,20 +225,51 @@ export default function WorkDetail() {
           <span>返回作品库</span>
         </button>
 
-        {/* Cover Image - 铺满边框且居中 */}
+        {/* Cover Image - 3:4 竖向比例，最大宽度限制 */}
         {work.cover_url && (
-          <div className="mb-10 max-w-md mx-auto rounded-lg overflow-hidden border-2 border-silver-main/50 shadow-[0_0_20px_rgba(192,192,192,0.2)] aspect-[3/4]">
-            <img 
-              src={work.cover_url} 
+          <div className="mb-6 w-full max-w-sm mx-auto rounded-lg overflow-hidden border-2 border-silver-main/50 shadow-[0_0_20px_rgba(192,192,192,0.2)] aspect-[3/4]">
+            <img
+              src={work.cover_url}
               alt={work.title}
-              className="w-full h-full object-cover" 
+              className="w-full h-full object-cover rounded-lg"
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
             />
           </div>
         )}
 
+        {/* 作品简介（吸引人的一句话，≤20字） */}
+        {work.description && (
+          <p className="text-gray-300 text-base italic mt-3 text-center max-w-2xl mx-auto">
+            {work.description}
+          </p>
+        )}
+
+        {/* 分隔线 */}
+        {(work.description || work.content) && (
+          <hr className="border-gray-700 my-4 max-w-3xl mx-auto" />
+        )}
+
+        {/* 作品详情（详细介绍） */}
+        {work.content && (
+          <>
+            <p className="text-gray-400 text-sm leading-relaxed max-w-3xl mx-auto whitespace-pre-wrap">
+              {work.content}
+            </p>
+            <hr className="border-gray-700 my-4 max-w-3xl mx-auto" />
+          </>
+        )}
+
         {/* Title and Meta */}
         <div className="mb-8 text-center">
+          <span
+            className={`inline-block px-3 py-1 text-sm font-cyber font-medium border rounded mb-4 ${
+              work.category === 'fanfiction'
+                ? 'bg-pink-600/80 border-pink-500 text-white'
+                : 'bg-silver-main/20 border-silver-main text-silver-light'
+            }`}
+          >
+            {work.category === 'fanfiction' ? '★ 同人' : '✦ 原创'}
+          </span>
           <h1 className="text-4xl md:text-5xl font-cyber font-bold text-silver-bright mb-4">
             {work.title}
           </h1>
@@ -299,18 +331,17 @@ export default function WorkDetail() {
             </div>
           )}
 
-          {/* Description */}
-          {work.description && (
-            <div className="max-w-3xl mx-auto">
-              <p className="text-lg text-gray-300 font-mono mb-6 bg-surface-dark border-l-4 border-silver-light p-4 rounded text-left">
-                {work.description}
-              </p>
-            </div>
-          )}
-
-          {/* Actions */}
+          {/* Actions - 编辑 / 删除（仅作者） */}
           {isOwner && (
             <div className="flex justify-center gap-4">
+              <Button
+                variant="primary"
+                onClick={() => navigate(`/works/${id}/edit`)}
+                className="flex items-center gap-2"
+              >
+                <Pencil size={18} />
+                编辑作品
+              </Button>
               <Button variant="destructive" onClick={handleDelete}>
                 删除作品
               </Button>
@@ -407,6 +438,9 @@ export default function WorkDetail() {
             </div>
           </div>
         )}
+
+        {/* 评论区 */}
+        <WorkComments workId={work.id} />
       </div>
     </div>
   )

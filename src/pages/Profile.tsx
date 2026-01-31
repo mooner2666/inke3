@@ -287,7 +287,8 @@ export default function Profile() {
                   author={profile.username}
                   authorDisplayName={profile.display_name}
                   viewCount={work.view_count} 
-                  tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)} 
+                  tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)}
+                  category={work.category ?? 'original'}
                 />
               ))}
             </div>
@@ -326,7 +327,8 @@ export default function Profile() {
                   author={work.profiles?.username || 'Unknown'}
                   authorDisplayName={work.profiles?.display_name}
                   viewCount={work.view_count} 
-                  tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)} 
+                  tags={work.work_tags.map(wt => wt.tags?.name || '').filter(Boolean)}
+                  category={work.category ?? 'original'}
                 />
               ))}
             </div>

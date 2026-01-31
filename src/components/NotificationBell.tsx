@@ -98,13 +98,22 @@ export default function NotificationBell() {
         return `${actorName} 评论了你的帖子 "${notif.post?.title}"`
       case 'reply':
         return `${actorName} 回复了你的评论`
+      case 'work_comment':
+        return `${actorName} 评论了你的作品`
+      case 'work_comment_reply':
+        return `${actorName} 回复了你（在作品中）`
       default:
         return '新通知'
     }
   }
 
   const getNotificationLink = (notif: Notification) => {
-    if (notif.work?.id) return `/works/${notif.work.id}`
+    if (notif.work?.id) {
+      if (notif.type === 'work_comment' || notif.type === 'work_comment_reply') {
+        return `/works/${notif.work.id}#comments`
+      }
+      return `/works/${notif.work.id}`
+    }
     if (notif.post?.id) return `/forum/${notif.post.id}`
     return '#'
   }
