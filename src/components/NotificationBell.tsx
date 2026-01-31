@@ -26,7 +26,6 @@ export default function NotificationBell() {
   useEffect(() => {
     if (user) {
       fetchUnreadCount()
-      // 每30秒刷新一次未读数
       const interval = setInterval(fetchUnreadCount, 30000)
       return () => clearInterval(interval)
     }
@@ -117,6 +116,7 @@ export default function NotificationBell() {
       <button
         onClick={handleOpen}
         className="relative p-2 text-silver-light hover:text-silver-main transition-colors"
+        aria-label="通知"
       >
         <Bell size={24} />
         {unreadCount > 0 && (
@@ -128,23 +128,28 @@ export default function NotificationBell() {
 
       {isOpen && (
         <>
+          {/* 背景遮罩 */}
           <div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0 z-40 bg-black/50 md:bg-transparent"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-96 bg-surface-dark border-2 border-silver-light/50 rounded-lg shadow-[0_0_30px_rgba(192,192,192,0.3)] z-50 max-h-[600px] overflow-hidden flex flex-col">
-            <div className="p-4 border-b border-silver-light/30 flex items-center justify-between">
+          
+          {/* 通知面板 */}
+          <div className="fixed md:absolute inset-x-4 top-20 md:inset-x-auto md:top-auto md:right-0 md:mt-2 md:w-96 bg-surface-dark border-2 border-silver-light/50 rounded-lg shadow-[0_0_30px_rgba(192,192,192,0.3)] z-50 max-h-[70vh] md:max-h-[600px] overflow-hidden flex flex-col">
+            {/* 标题栏 */}
+            <div className="p-4 border-b border-silver-light/30 flex items-center justify-between bg-deep-black/50 backdrop-blur">
               <h3 className="font-cyber text-lg text-white">通知</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-silver-light hover:text-silver-main font-mono"
+                  className="text-xs text-silver-light hover:text-silver-main font-mono transition-colors"
                 >
                   全部已读
                 </button>
               )}
             </div>
 
+            {/* 通知列表 */}
             <div className="overflow-y-auto flex-1">
               {loading ? (
                 <div className="p-8 text-center text-silver-medium font-mono">加载中...</div>
@@ -164,7 +169,7 @@ export default function NotificationBell() {
                         !notif.is_read ? 'bg-silver-main/5' : ''
                       }`}
                     >
-                      <p className="text-sm text-white font-mono mb-1">
+                      <p className="text-sm text-white font-mono mb-1 leading-relaxed">
                         {getNotificationText(notif)}
                       </p>
                       <p className="text-xs text-gray-400 font-mono">

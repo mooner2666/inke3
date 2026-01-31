@@ -6,6 +6,11 @@ import { supabase } from '@/lib/supabase'
 import { Database } from '@/types/database.types'
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
+
+<button onClick={() => toast.success('Toast 测试成功！')}>
+  测试 Toast
+</button>
 
 type Work = Database['public']['Tables']['works']['Row'] & {
   profiles: { username: string; display_name: string | null } | null
